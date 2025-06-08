@@ -11,9 +11,9 @@
  * - An optional optimized precomputation for generalized factorial (GenFact) calculations.
  * - A complete filter application function with edge‐handling.
  *
- * @author 
+ * @author
  * Tugbars Heptaskin
- * @date 
+ * @date
  * 2025-02-01
  */
 
@@ -38,26 +38,50 @@
 #define ENABLE_MEMOIZATION
 
 /// Uncomment the following line to build with a test main
-//#define TEST_MAIN
+// #define TEST_MAIN
 
 /// Data type precision statements
 #ifdef FLOAT_DOUBLE		// double
 #define ZERO	0.0
+#define HALV	0.5
 #define ONE	1.0
 #define TWO	2.0
 #define FOUR	4.0
+#define FIVE	5.0
+#define SIX	6.0
+#define EIGHT	8.0
+#define TEN    10.0
+#define ELEVEN 11.0
+#define TWELVE 12.0
+#define FORTYONE 41.0
 #define FLOAT	double
 #elif  FLOAT_LONG_DOUBLE	// long double
 #define ZERO	0.0l
+#define HALV	0.5l
 #define ONE	1.0l
 #define TWO	2.0l
 #define FOUR	4.0l
+#define FIVE	5.0l
+#define SIX	6.0l
+#define EIGHT	8.0l
+#define TEN    10.0l
+#define ELEVEN 11.0l
+#define TWELVE 12.0l
+#define FORTYONE 41.0l
 #define FLOAT	long double
 #else				// default - float
 #define ZERO	0.0f
+#define HALV	0.5f
 #define ONE	1.0f
 #define TWO	2.0f
 #define FOUR	4.0f
+#define FIVE	5.0f
+#define SIX	6.0f
+#define EIGHT	8.0f
+#define TEN    10.0f
+#define ELEVEN 11.0f
+#define TWELVE 12.0f
+#define FORTYONE 41.0f
 #define FLOAT	float
 #endif
 
@@ -70,7 +94,8 @@
  *
  * Represents a single measurement with a phase angle.
  */
-typedef struct {
+typedef struct
+{
     FLOAT phaseAngle;
 } MqsRawDataPoint_t;
 
@@ -80,12 +105,13 @@ typedef struct {
  * Contains filter parameters such as the half-window size, the polynomial order,
  * the target point in the window, the derivative order, and the time step.
  */
-typedef struct {
-    uint8_t halfWindowSize;   /**< Half window size (window size = 2*halfWindowSize+1) */
-    uint8_t polynomialOrder;  /**< Order of the polynomial used for fitting */
-    uint8_t targetPoint;      /**< Target point within the window (usually center) */
-    uint8_t derivativeOrder;  /**< Order of the derivative to compute (0 for smoothing) */
-    FLOAT time_step;          /**< Time step used in the filter */
+typedef struct
+{
+    uint8_t halfWindowSize;  /**< Half window size (window size = 2*halfWindowSize+1) */
+    uint8_t polynomialOrder; /**< Order of the polynomial used for fitting */
+    uint8_t targetPoint;     /**< Target point within the window (usually center) */
+    uint8_t derivativeOrder; /**< Order of the derivative to compute (0 for smoothing) */
+    FLOAT time_step;         /**< Time step used in the filter */
 } SavitzkyGolayFilterConfig;
 
 /**
@@ -93,7 +119,8 @@ typedef struct {
  *
  * Contains the filter configuration and a scaling factor (dt) computed based on the derivative order.
  */
-typedef struct {
+typedef struct
+{
     SavitzkyGolayFilterConfig conf; /**< Filter configuration parameters */
     FLOAT dt;                       /**< Scaling factor computed as (time_step)^derivativeOrder */
 } SavitzkyGolayFilter;
@@ -104,52 +131,62 @@ typedef struct {
  * This context is passed to functions that compute Gram polynomials for use in
  * calculating filter weights.
  */
-typedef struct {
+typedef struct
+{
     uint8_t halfWindowSize;  /**< Half window size for the filter */
     uint8_t targetPoint;     /**< Target point (index offset) in the window */
     uint8_t derivativeOrder; /**< Order of the derivative */
 } GramPolyContext;
+
+typedef struct
+{
+    bool isComputed;
+    FLOAT value;
+} GramPolyCacheEntry;
 
 //-------------------------
 // Function Declarations
 //-------------------------
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/**
- * @brief Applies the Savitzky–Golay filter to a data array.
- *
- * This is the main entry point for filtering a data sequence. It performs error checking,
- * initializes the filter, and applies the filter to the raw data.
- *
- * @param data         Array of raw data points (input).
- * @param dataSize     Number of data points in the array.
- * @param halfWindowSize Half-window size (filter window size = 2*halfWindowSize+1).
- * @param filteredData Array to store the filtered data points (output).
- * @param polynomialOrder Order of the polynomial used for fitting.
- * @param targetPoint  The target point in the filter window.
- * @param derivativeOrder Order of the derivative (0 for smoothing).
- */
-int mes_savgolFilter(MqsRawDataPoint_t data[], size_t dataSize, uint8_t halfWindowSize,
-    MqsRawDataPoint_t filteredData[], uint8_t polynomialOrder,
-    uint8_t targetPoint, uint8_t derivativeOrder);
+    /**
+     * @brief Applies the Savitzky–Golay filter to a data array.
+     *
+     * This is the main entry point for filtering a data sequence. It performs error checking,
+     * initializes the filter, and applies the filter to the raw data.
+     *
+     * @param data         Array of raw data points (input).
+     * @param dataSize     Number of data points in the array.
+     * @param halfWindowSize Half-window size (filter window size = 2*halfWindowSize+1).
+     * @param filteredData Array to store the filtered data points (output).
+     * @param polynomialOrder Order of the polynomial used for fitting.
+     * @param targetPoint  The target point in the filter window.
+     * @param derivativeOrder Order of the derivative (0 for smoothing).
+     */
+    int mes_savgolFilter(MqsRawDataPoint_t data[], size_t dataSize, uint8_t halfWindowSize,
+                         MqsRawDataPoint_t filteredData[], uint8_t polynomialOrder,
+                         uint8_t targetPoint, uint8_t derivativeOrder);
 
-/**
- * @brief Initializes a Savitzky–Golay filter instance.
- *
- * Sets the configuration parameters and computes the scaling factor based on the derivative order.
- *
- * @param halfWindowSize Half-window size.
- * @param polynomialOrder Polynomial order.
- * @param targetPoint Target point within the window.
- * @param derivativeOrder Derivative order.
- * @param time_step Time step value.
- * @return A SavitzkyGolayFilter structure with initialized values.
- */
-SavitzkyGolayFilter initFilter(uint8_t halfWindowSize, uint8_t polynomialOrder, uint8_t targetPoint,
-                               uint8_t derivativeOrder, FLOAT time_step);
+    /**
+     * @brief Initializes a Savitzky–Golay filter instance.
+     *
+     * Sets the configuration parameters and computes the scaling factor based on the derivative order.
+     *
+     * @param halfWindowSize Half-window size.
+     * @param polynomialOrder Polynomial order.
+     * @param targetPoint Target point within the window.
+     * @param derivativeOrder Derivative order.
+     * @param time_step Time step value.
+     * @return A SavitzkyGolayFilter structure with initialized values.
+     */
+    SavitzkyGolayFilter initFilter(uint8_t halfWindowSize, uint8_t polynomialOrder, uint8_t targetPoint,
+                                   uint8_t derivativeOrder, FLOAT time_step);
+
+    const GramPolyCacheEntry *GetGramPolyCacheEntry(int shiftedIndex, uint8_t polyOrder, uint8_t derivOrder);
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,7 @@ target_include_directories(savgol_app PRIVATE
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(savgol_app PRIVATE -mavx -mfma)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    target_compile_options(savgol_app PRIVATE /arch:AVX)
+    target_compile_options(savgol_app PRIVATE /MT /arch:AVX)
     target_link_options(savgol_app PRIVATE /NODEFAULTLIB:libcmt.lib)
 endif()
 
@@ -43,7 +43,7 @@ target_include_directories(test_savgolFilter PRIVATE
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(test_savgolFilter PRIVATE -mavx -mfma)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    target_compile_options(test_savgolFilter PRIVATE /arch:AVX)
+    target_compile_options(test_savgolFilter PRIVATE /MT /arch:AVX)
     target_link_options(test_savgolFilter PRIVATE /NODEFAULTLIB:libcmt.lib)
 endif()
 
