@@ -372,7 +372,7 @@ static FLOAT GramPolyIterative(uint8_t polynomialOrder, int dataIndex, const Gra
     // OPTIMIZATION: Hoist division out of loop
     // Original code would compute (1/halfWindowSize) for each d
     // Optimized: Compute once and reuse
-    float inv_half = 1.0f / halfWindowSize;
+    FLOAT inv_half = ONE / halfWindowSize;
     
     // Handle d=0 separately to eliminate branch in loop
     // F(1, 0) = (1/n) × i × F(0, 0) = (1/n) × i × 1 = i/n
@@ -404,7 +404,7 @@ static FLOAT GramPolyIterative(uint8_t polynomialOrder, int dataIndex, const Gra
     //   c(k) = (k-1)(2n + k) / [k(2n - k + 1)]
     
     // Precompute constant used in both a(k) and c(k)
-    float two_halfWinSize = 2.0f * halfWindowSize;
+    FLOAT two_halfWinSize = TWO * halfWindowSize;
     
     for (uint8_t k = 2; k <= polynomialOrder; k++)
     {
@@ -766,7 +766,7 @@ static void ComputeWeights(uint8_t halfWindowSize, uint16_t targetPoint, uint8_t
  */
 
 typedef struct {
-    float weights[MAX_WINDOW];      // Precomputed weights for this edge position
+    FLOAT weights[MAX_WINDOW];      // Precomputed weights for this edge position
     uint8_t halfWindowSize;         // Filter parameter: n
     uint8_t polynomialOrder;        // Filter parameter: m
     uint8_t derivativeOrder;        // Filter parameter: d
@@ -1014,7 +1014,7 @@ static void ApplyFilter(MqsRawDataPoint_t data[], size_t dataSize, uint8_t halfW
         FLOAT sum3 = ZERO;  // Accumulator for chain 3 (processes indices 3, 7, 11, ...)
         
         // Set up base pointers for weight and data access
-        const float *w_ptr = weights;           // Points to current weight
+        const FLOAT *w_ptr = weights;           // Points to current weight
         const MqsRawDataPoint_t *d_ptr = &data[i];  // Points to current data
         
         //----------------------------------------------------------------------
@@ -1136,8 +1136,8 @@ static void ApplyFilter(MqsRawDataPoint_t data[], size_t dataSize, uint8_t halfW
         }
         
         // Select weight source: cached or freshly computed
-        const float *edgeWeights;
-        static float tempWeights[MAX_WINDOW];
+        const FLOAT *edgeWeights;
+        static FLOAT tempWeights[MAX_WINDOW];
         
         if (useCache && i < MAX_HALF_WINDOW_FOR_MEMO)
         {
@@ -1153,7 +1153,7 @@ static void ApplyFilter(MqsRawDataPoint_t data[], size_t dataSize, uint8_t halfW
             // Try to cache for future use
             if (i < MAX_HALF_WINDOW_FOR_MEMO)
             {
-                memcpy(leadingEdgeCache[i].weights, tempWeights, windowSize * sizeof(float));
+                memcpy(leadingEdgeCache[i].weights, tempWeights, windowSize * sizeof(FLOAT));
                 leadingEdgeCache[i].halfWindowSize = halfWindowSize;
                 leadingEdgeCache[i].polynomialOrder = filter.conf.polynomialOrder;
                 leadingEdgeCache[i].derivativeOrder = filter.conf.derivativeOrder;
@@ -1178,8 +1178,8 @@ static void ApplyFilter(MqsRawDataPoint_t data[], size_t dataSize, uint8_t halfW
         // WHY REVERSE?
         // The polynomial fit is shifted to the right (targetPoint > center)
         // so the rightmost data point gets weight[0], which has the highest weight
-        float leadSum0 = ZERO, leadSum1 = ZERO, leadSum2 = ZERO, leadSum3 = ZERO;
-        const float *w_ptr = edgeWeights;
+        FLOAT leadSum0 = ZERO, leadSum1 = ZERO, leadSum2 = ZERO, leadSum3 = ZERO;
+        const FLOAT *w_ptr = edgeWeights;
         const MqsRawDataPoint_t *d_ptr = &data[windowSize - 1];  // Start from rightmost
         
         // Handle remainder elements
@@ -1221,7 +1221,7 @@ static void ApplyFilter(MqsRawDataPoint_t data[], size_t dataSize, uint8_t halfW
         }
         
         // Combine accumulators and store leading edge result
-        float leadingSum = (leadSum0 + leadSum1) + (leadSum2 + leadSum3);
+        FLOAT leadingSum = (leadSum0 + leadSum1) + (leadSum2 + leadSum3);
         filteredData[i].phaseAngle = leadingSum;
 
         //----------------------------------------------------------------------
