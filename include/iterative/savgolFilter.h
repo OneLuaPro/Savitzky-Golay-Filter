@@ -31,45 +31,21 @@
 /// Data type precision statements
 #ifdef FLOAT_DOUBLE		// double
 #define ZERO	0.0
-#define HALV	0.5
 #define ONE	1.0
 #define TWO	2.0
 #define FOUR	4.0
-#define FIVE	5.0
-#define SIX	6.0
-#define EIGHT	8.0
-#define TEN    10.0
-#define ELEVEN 11.0
-#define TWELVE 12.0
-#define FORTYONE 41.0
 #define FLOAT	double
 #elif  FLOAT_LONG_DOUBLE	// long double
 #define ZERO	0.0l
-#define HALV	0.5l
 #define ONE	1.0l
 #define TWO	2.0l
 #define FOUR	4.0l
-#define FIVE	5.0l
-#define SIX	6.0l
-#define EIGHT	8.0l
-#define TEN    10.0l
-#define ELEVEN 11.0l
-#define TWELVE 12.0l
-#define FORTYONE 41.0l
 #define FLOAT	long double
 #else				// default - float
 #define ZERO	0.0f
-#define HALV	0.5f
 #define ONE	1.0f
 #define TWO	2.0f
 #define FOUR	4.0f
-#define FIVE	5.0f
-#define SIX	6.0f
-#define EIGHT	8.0f
-#define TEN    10.0f
-#define ELEVEN 11.0f
-#define TWELVE 12.0f
-#define FORTYONE 41.0f
 #define FLOAT	float
 #endif
 
