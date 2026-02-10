@@ -9,11 +9,21 @@ set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/iterative)
 # =============================================================================
 
 add_library(savgolFilter STATIC
+    ${INCLUDE_DIR}/savgolFilter.h
     savgolFilter.c
 )
 
 target_include_directories(savgolFilter PUBLIC
     ${INCLUDE_DIR}
+)
+
+install(TARGETS savgolFilter
+    LIBRARY DESTINATION ${INSTALL_LIBDIR} COMPONENT lib
+)
+
+install(FILES "${INCLUDE_DIR}/savgolFilter.h"
+    DESTINATION ${INSTALL_INCLUDEDIR}
+    COMPONENT dev
 )
 
 # =============================================================================
@@ -30,7 +40,10 @@ if(USE_PARALLEL_SAVGOL)
         target_compile_definitions(savgolFilterMT PRIVATE USE_OPENMP)
         target_link_libraries(savgolFilterMT PUBLIC OpenMP::OpenMP_C)
         message(STATUS "Building parallel savgolFilterMT with OpenMP")
-    else()
+	install(TARGETS savgolFilterMT
+	    LIBRARY DESTINATION ${INSTALL_LIBDIR} COMPONENT lib
+	)
+      else()
         message(WARNING "OpenMP not found, USE_PARALLEL_SAVGOL ignored")
     endif()
 endif()
@@ -54,6 +67,15 @@ else()
     target_link_libraries(savgolStream PUBLIC savgolFilter)
 endif()
 
+install(TARGETS savgolStream
+    LIBRARY DESTINATION ${INSTALL_LIBDIR} COMPONENT lib
+)
+
+install(FILES "${INCLUDE_DIR}/savgol_stream.h"
+    DESTINATION ${INSTALL_INCLUDEDIR}
+    COMPONENT dev
+)
+
 # =============================================================================
 # Coefficient Export Tool
 # =============================================================================
@@ -68,6 +90,10 @@ if(UNIX)
     target_link_libraries(savgol_export PRIVATE m)
 endif()
 
+install(TARGETS savgol_export
+    RUNTIME DESTINATION ${INSTALL_BINDIR} COMPONENT bin
+)
+
 # =============================================================================
 # 2D Filter Library
 # =============================================================================
@@ -80,3 +106,12 @@ target_include_directories(savgol2d PUBLIC ${INCLUDE_DIR})
 if(UNIX)
     target_link_libraries(savgol2d PUBLIC m)
 endif()
+
+install(TARGETS savgol2d
+    LIBRARY DESTINATION ${INSTALL_LIBDIR} COMPONENT lib
+)
+
+install(FILES "${INCLUDE_DIR}/savgol2d.h"
+    DESTINATION ${INSTALL_INCLUDEDIR}
+    COMPONENT dev
+)

@@ -22,13 +22,70 @@
  * The generated header can be used with a lightweight apply function that
  * only performs convolution (no weight computation at runtime).
  */
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+
+/* -------------------------------------------------------------------------- */
+/* MSVC Compatibility Layer for getopt_long                                   */
+/* -------------------------------------------------------------------------- */
+#ifdef _MSC_VER
+
+#define no_argument       0
+#define required_argument 1
+
+struct option {
+    const char *name;
+    int has_arg;
+    int *flag;
+    int val;
+};
+
+static char *optarg = NULL;
+static int optind = 1;
+
+static int getopt_long(int argc, char *const argv[], const char *optstring,
+                       const struct option *longopts, int *longindex) {
+    if (optind >= argc) return -1;
+    char *arg = argv[optind];
+    if (arg[0] != '-') return -1;
+
+    // Handle Long Options: --half-window, etc.
+    if (arg[0] == '-' && arg[1] == '-') {
+        char *name = arg + 2;
+        for (int i = 0; longopts[i].name; i++) {
+            if (strcmp(longopts[i].name, name) == 0) {
+                if (longopts[i].has_arg == required_argument) {
+                    if (optind + 1 < argc) optarg = argv[++optind];
+                }
+                optind++;
+                return longopts[i].val;
+            }
+        }
+    }
+
+    // Handle Short Options: -n, -m, etc.
+    char c = arg[1];
+    const char *p = strchr(optstring, c);
+    if (p) {
+        if (p[1] == ':') {
+            if (optind + 1 < argc) optarg = argv[++optind];
+        }
+        optind++;
+        return c;
+    }
+    return -1;
+}
+#else
 #include <getopt.h>
+#endif
+/* -------------------------------------------------------------------------- */
 
 #include "savgolFilter.h"
 

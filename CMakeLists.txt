@@ -13,6 +13,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # =============================================================================
 # BUILD OPTIONS
 # =============================================================================
+include (GNUInstallDirs)
+set(INSTALL_BINDIR
+  ${CMAKE_INSTALL_BINDIR} CACHE PATH "Installation directory for binaries")
+set(INSTALL_LIBDIR
+  ${CMAKE_INSTALL_LIBDIR} CACHE PATH "Installation directory for libraries")
+set(INSTALL_INCLUDEDIR
+  ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Installation directory for header files")
 option(USE_PARALLEL_SAVGOL "Build parallel (OpenMP) version of Savitzky-Golay filter" OFF)
 
 # Print selected build mode

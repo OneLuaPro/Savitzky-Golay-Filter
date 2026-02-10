@@ -942,7 +942,7 @@ int savgol_apply_strided(const SavgolFilter *filter,
  * uncomment this section. It wraps the new API.
  */
 
-#if 0  /* Set to 1 to enable legacy API */
+#if 1  /* Set to 1 to enable legacy API */
 
 typedef struct {
     float phaseAngle;

@@ -3,6 +3,8 @@
 **Author:** Tugbars Heptaskin  
 **Last Updated:** 2026-01-28
 
+**Note:** This fork includes specific enhancements and fixes for the MSVC compiler on Windows. It serves as the core for the **luaSGF** bindings, which can be found at https://github.com/OneLuaPro/luaSGF.
+
 ## Overview
 
 This is a highly-optimized implementation of the Savitzky-Golay filter for data smoothing and differentiation. The implementation achieves **4-6x speedup** over naive approaches through a comprehensive optimization strategy while maintaining **bit-exact compatibility with MATLAB's `sgolayfilt` function** (differences on the order of 10⁻⁶).

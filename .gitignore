@@ -2,3 +2,5 @@
 cmdMem.c
 impulseDrive.c
 /.cache
+*.*~
+build64
