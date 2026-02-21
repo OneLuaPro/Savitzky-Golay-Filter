@@ -38,12 +38,26 @@ endif()
 
 # Fetch GoogleTest
 include(FetchContent)
+# Forces GoogleTest to link against the Shared C Runtime (MSVC /MD), ensuring
+# consistency with the project's runtime settings and preventing linker conflicts.
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_Declare(
     googletest
     GIT_REPOSITORY https://github.com/google/googletest.git
     GIT_TAG release-1.12.1
 )
 FetchContent_MakeAvailable(googletest)
+
+# Suppress specific IntelLLVM compiler warnings for GoogleTest targets to prevent
+# build failures when "Warnings as Errors" is enabled, specifically addressing
+# char16_t to char32_t conversions.
+if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+  foreach(_target gtest gtest_main gmock gmock_main)
+    if(TARGET ${_target})
+      target_compile_options(${_target} PRIVATE "-W0" "-Wno-error=character-conversion")
+    endif()
+  endforeach()
+endif()
 
 # Fetch FFF (Fake Function Framework)
 FetchContent_Declare(
