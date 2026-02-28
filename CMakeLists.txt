@@ -1,5 +1,9 @@
 # Minimum CMake version required
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
+
+if(POLICY CMP0091)
+  cmake_policy(SET CMP0091 NEW)
+endif()
 
 # Project name and languages
 project(SavitzkyGolayFilter LANGUAGES C CXX)
